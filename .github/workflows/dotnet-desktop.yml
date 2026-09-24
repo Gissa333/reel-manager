@@ -1,4 +1,4 @@
-name: Build Reel Manager
+name: Build Reel Manager Setup
 
 on:
   push:
@@ -26,8 +26,21 @@ jobs:
     - name: Publish
       run: dotnet publish --configuration Release --runtime win-x64 --self-contained true -p:PublishSingleFile=true -o publish
 
-    - name: Upload artifact
+    - name: Install Inno Setup
+      run: choco install innosetup -y --no-progress
+
+    - name: Build Installer
+      run: |
+        & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+
+    - name: Upload Setup
       uses: actions/upload-artifact@v4
       with:
-        name: ReelManager
+        name: ReelManager_Setup
+        path: installer_output/*.exe
+
+    - name: Upload Portable
+      uses: actions/upload-artifact@v4
+      with:
+        name: ReelManager_Portable
         path: publish/
